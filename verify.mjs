@@ -24,8 +24,6 @@ export async function doVerify(page, otp) {
   await page.keyboard.press('Tab'); // triggers Angular's ng-blur validation
   await page.waitForTimeout(rand(300, 500));
 
-  // ── Submit ──────────────────────────────────────────────────────────────────
-
   // The submit button starts disabled and becomes enabled once Angular
   // sees a valid 6-digit value in the input
   try {
@@ -34,19 +32,23 @@ export async function doVerify(page, otp) {
     console.warn('OTP submit button did not become enabled within 10 s — the OTP may be wrong or too short.');
   }
 
-  // Screenshot before clicking so we can confirm the OTP was entered correctly
-  await page.screenshot({ path: '/app/screenshot-otp-before.png', fullPage: true });
-  console.log('Screenshot saved: /app/screenshot-otp-before.png');
+  // ── Stage 04: OTP filled — code entered, button enabled ─────────────────────
+
+  await page.screenshot({ path: '/app/screenshot-04-otp-filled.png', fullPage: true });
+  console.log('Screenshot saved: /app/screenshot-04-otp-filled.png');
+  writeFileSync('/app/dom-04-otp-filled.html', await page.content(), 'utf-8');
+  console.log('DOM saved: /app/dom-04-otp-filled.html');
+
+  // ── Click OTP submit ────────────────────────────────────────────────────────
 
   console.log('Clicking OTP submit (אישור)...');
   await page.click('button.login-id-btn');
   await page.waitForTimeout(3000); // let the page navigate to the authenticated area
 
-  // Screenshot after OTP submit — should show the logged-in dashboard if successful
-  await page.screenshot({ path: '/app/screenshot-otp-after.png', fullPage: true });
-  console.log('Screenshot saved: /app/screenshot-otp-after.png');
+  // ── Stage 05: authenticated — result page after OTP submit ──────────────────
 
-  // Save the final DOM for inspection
-  writeFileSync('/app/dom-after-otp.html', await page.content(), 'utf-8');
-  console.log('DOM saved: /app/dom-after-otp.html');
+  await page.screenshot({ path: '/app/screenshot-05-authenticated.png', fullPage: true });
+  console.log('Screenshot saved: /app/screenshot-05-authenticated.png');
+  writeFileSync('/app/dom-05-authenticated.html', await page.content(), 'utf-8');
+  console.log('DOM saved: /app/dom-05-authenticated.html');
 }

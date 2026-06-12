@@ -57,6 +57,13 @@ export async function doLogin(idNumber, phoneNumber) {
   await page.waitForSelector('#id-identity-input', { state: 'visible' });
   console.log('Login page ready.');
 
+  // ── Stage 01: page loaded — empty form ─────────────────────────────────────
+
+  await page.screenshot({ path: '/app/screenshot-01-page-loaded.png', fullPage: true });
+  console.log('Screenshot saved: /app/screenshot-01-page-loaded.png');
+  writeFileSync('/app/dom-01-page-loaded.html', await page.content(), 'utf-8');
+  console.log('DOM saved: /app/dom-01-page-loaded.html');
+
   // ── Fill ID number ──────────────────────────────────────────────────────────
 
   console.log(`Entering ID: ${idNumber}`);
@@ -81,8 +88,6 @@ export async function doLogin(idNumber, phoneNumber) {
   await page.keyboard.press('Tab'); // triggers Angular's ng-blur validation
   await page.waitForTimeout(rand(350, 600));
 
-  // ── Submit ──────────────────────────────────────────────────────────────────
-
   // The submit button starts disabled and becomes enabled once Angular
   // validates all fields — wait up to 15 seconds for that
   console.log('Waiting for submit button to become enabled...');
@@ -92,21 +97,25 @@ export async function doLogin(idNumber, phoneNumber) {
     console.warn('Submit button did not become enabled within 15 s.');
   }
 
-  // Screenshot before clicking so we can verify the fields were filled correctly
-  await page.screenshot({ path: '/app/screenshot-credentials-filled.png', fullPage: true });
-  console.log('Screenshot saved: /app/screenshot-credentials-filled.png');
+  // ── Stage 02: credentials filled — ID + phone entered, button enabled ───────
+
+  await page.screenshot({ path: '/app/screenshot-02-credentials-filled.png', fullPage: true });
+  console.log('Screenshot saved: /app/screenshot-02-credentials-filled.png');
+  writeFileSync('/app/dom-02-credentials-filled.html', await page.content(), 'utf-8');
+  console.log('DOM saved: /app/dom-02-credentials-filled.html');
+
+  // ── Click submit ────────────────────────────────────────────────────────────
 
   console.log('Clicking submit (אישור)...');
   await page.click('button#submit');
   await page.waitForTimeout(2000); // let the page transition to the OTP screen
 
-  // Screenshot of the OTP entry screen that appears after a successful credentials submit
-  await page.screenshot({ path: '/app/screenshot-otp-screen.png', fullPage: true });
-  console.log('Screenshot saved: /app/screenshot-otp-screen.png');
+  // ── Stage 03: OTP screen — waiting for the user to receive and enter OTP ────
 
-  // Save the DOM so we can inspect the OTP page structure if needed
-  writeFileSync('/app/dom-after-submit.html', await page.content(), 'utf-8');
-  console.log('DOM saved: /app/dom-after-submit.html');
+  await page.screenshot({ path: '/app/screenshot-03-otp-screen.png', fullPage: true });
+  console.log('Screenshot saved: /app/screenshot-03-otp-screen.png');
+  writeFileSync('/app/dom-03-otp-screen.html', await page.content(), 'utf-8');
+  console.log('DOM saved: /app/dom-03-otp-screen.html');
 
   // Return the page so server.mjs can hold on to it and pass it to doVerify()
   return page;
