@@ -30,7 +30,11 @@ const server = http.createServer(async (req, res) => {
 
     const child = spawn('node', [join(__dir, 'login.mjs')], {
       stdio: 'inherit',
-      env: process.env,
+      env: {
+        ...process.env,
+        ...(payload.idNumber && { ID_NUMBER: payload.idNumber }),
+        ...(payload.phoneNumber && { PHONE_NUMBER: payload.phoneNumber }),
+      },
     });
     child.on('error', err => console.error('[/login] Failed to spawn login.mjs:', err));
     child.on('exit', code => console.log(`[/login] login.mjs exited with code ${code}`));

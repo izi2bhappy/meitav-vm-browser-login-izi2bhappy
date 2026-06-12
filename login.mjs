@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -7,12 +7,20 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const configFile = ['local.config.json', 'config.json'].find(f => {
-  try { readFileSync(join(__dir, f)); return true; } catch { return false; }
-});
-if (!configFile) throw new Error('No config file found (tried local.config.json, config.json)');
-const config = JSON.parse(readFileSync(join(__dir, configFile), 'utf-8'));
-const { idNumber, phoneNumber, submitForm = true } = config;
+let idNumber, phoneNumber, submitForm;
+
+if (process.env.ID_NUMBER && process.env.PHONE_NUMBER) {
+  idNumber = process.env.ID_NUMBER;
+  phoneNumber = process.env.PHONE_NUMBER;
+  submitForm = true;
+} else {
+  const configFile = ['local.config.json', 'config.json'].find(f => {
+    try { readFileSync(join(__dir, f)); return true; } catch { return false; }
+  });
+  if (!configFile) throw new Error('No config file found (tried local.config.json, config.json)');
+  const config = JSON.parse(readFileSync(join(__dir, configFile), 'utf-8'));
+  ({ idNumber, phoneNumber, submitForm = true } = config);
+}
 
 // ── Phone parsing ─────────────────────────────────────────────────────────────
 
@@ -122,6 +130,9 @@ if (submitForm) {
   await page.waitForTimeout(2000);
   await page.screenshot({ path: '/app/screenshot-after.png', fullPage: true });
   console.log('Screenshot saved: /app/screenshot-after.png');
+  const domContent = await page.content();
+  writeFileSync('/app/dom-after-submit.html', domContent, 'utf-8');
+  console.log('DOM saved: /app/dom-after-submit.html');
   console.log('Form submitted. Browser will stay open so you can see the result.');
 } else {
   console.log('submitForm = false — skipping click. Browser will stay open.');
