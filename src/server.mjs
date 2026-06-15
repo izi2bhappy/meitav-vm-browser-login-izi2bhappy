@@ -166,6 +166,42 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ── POST /verify_and_deliver ──────────────────────────────────────────────────
+  // Composite endpoint: verifies the OTP, downloads the residency declaration,
+  // and emails it — all in one call. Replaces the three-step /verify →
+  // /download_document → /email_document sequence for the common happy path.
+  if (req.url === '/verify_and_deliver') {
+    console.log('[/verify_and_deliver] payload:', JSON.stringify(payload, null, 2));
+
+    const otp = payload.otp ? String(payload.otp) : null;
+    if (!otp) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'otp is required' }));
+      return;
+    }
+    if (!activePage) {
+      res.writeHead(409, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'no active login session — call /login first' }));
+      return;
+    }
+
+    try {
+      await doVerify(activePage, otp);
+      console.log('[/verify_and_deliver] OTP verified, downloading document...');
+      const { savePath, filename } = await doDownloadDocument(activePage);
+      lastDownload = { savePath, filename };
+      console.log('[/verify_and_deliver] Document downloaded, emailing...');
+      await doEmailDocument(savePath, filename);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'delivered', filename, to: 'israelkariti@gmail.com' }));
+    } catch (err) {
+      console.error('[/verify_and_deliver] Error:', err);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
   // ── POST /email_document ─────────────────────────────────────────────────────
   // Emails the most recently downloaded document to israelkariti@gmail.com.
   // Requires /download_document to have been called first.
