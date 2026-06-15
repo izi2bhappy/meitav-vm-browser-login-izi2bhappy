@@ -2,24 +2,27 @@ import nodemailer from 'nodemailer';
 import { readFileSync } from 'fs';
 
 const RECIPIENT = 'israelkariti@gmail.com';
+const SENDER   = 'accaut322@gmail.com';
 
 export async function doEmailDocument(savePath, filename) {
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
-    throw new Error('GMAIL_USER and GMAIL_APP_PASSWORD environment variables are required');
+  const { GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN } = process.env;
+  if (!GMAIL_CLIENT_ID || !GMAIL_CLIENT_SECRET || !GMAIL_REFRESH_TOKEN) {
+    throw new Error('GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET and GMAIL_REFRESH_TOKEN environment variables are required');
   }
 
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    service: 'gmail',
     auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
+      type: 'OAuth2',
+      user: SENDER,
+      clientId: GMAIL_CLIENT_ID,
+      clientSecret: GMAIL_CLIENT_SECRET,
+      refreshToken: GMAIL_REFRESH_TOKEN,
     },
   });
 
   await transporter.sendMail({
-    from: process.env.GMAIL_USER,
+    from: SENDER,
     to: RECIPIENT,
     subject: `Meitav document: ${filename}`,
     text: 'Please find the requested Meitav document attached.',
