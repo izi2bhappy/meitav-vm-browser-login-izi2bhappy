@@ -4,6 +4,7 @@ import { doVerify } from './verify.mjs';
 import { doResend } from './resend.mjs';
 import { doDownloadDocument } from './download_document.mjs';
 import { doEmailDocument } from './email_document.mjs';
+import { doUploadToDrive } from './upload_to_drive.mjs';
 
 const PORT = process.env.PORT || 8080;
 
@@ -192,11 +193,14 @@ const server = http.createServer(async (req, res) => {
       console.log('[/verify_and_deliver] OTP verified, downloading document...');
       const { savePath, filename } = await doDownloadDocument(activePage);
       lastDownload = { savePath, filename };
-      step = 'email';
-      console.log('[/verify_and_deliver] Document downloaded, emailing...');
-      await doEmailDocument(savePath, filename);
+      step = 'deliver';
+      console.log('[/verify_and_deliver] Document downloaded, emailing and uploading to Drive...');
+      const [driveLink] = await Promise.all([
+        doUploadToDrive(savePath, filename),
+        doEmailDocument(savePath, filename),
+      ]);
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ status: 'delivered', filename, to: 'israelkariti@gmail.com' }));
+      res.end(JSON.stringify({ status: 'delivered', filename, driveLink, emailedTo: 'israelkariti@gmail.com' }));
     } catch (err) {
       console.error('[/verify_and_deliver] Error:', err);
       res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -219,9 +223,12 @@ const server = http.createServer(async (req, res) => {
     }
 
     try {
-      await doEmailDocument(lastDownload.savePath, lastDownload.filename);
+      const [driveLink] = await Promise.all([
+        doUploadToDrive(lastDownload.savePath, lastDownload.filename),
+        doEmailDocument(lastDownload.savePath, lastDownload.filename),
+      ]);
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ status: 'sent', filename: lastDownload.filename, to: 'israelkariti@gmail.com' }));
+      res.end(JSON.stringify({ status: 'delivered', filename: lastDownload.filename, driveLink, emailedTo: 'israelkariti@gmail.com' }));
     } catch (err) {
       console.error('[/email_document] Error:', err);
       res.writeHead(500, { 'Content-Type': 'application/json' });
