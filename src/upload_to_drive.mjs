@@ -23,7 +23,7 @@ export async function doUploadToDrive(savePath, filename) {
 
   await drive.permissions.create({
     fileId: data.id,
-    requestBody: { role: 'reader', type: 'anyone' },
+    requestBody: { role: 'reader', type: 'user', emailAddress: 'israelkariti@gmail.com' },
   });
 
   console.log(`[upload_to_drive] Uploaded ${filename}: ${data.webViewLink}`);
