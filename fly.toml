@@ -6,6 +6,9 @@
 app = 'meitav-vm-browser-login'
 primary_region = 'fra'
 
+[env]
+  SCREENSHOT_DIR = "/app"
+
 [build]
 
 [http_service]

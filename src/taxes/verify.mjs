@@ -1,4 +1,5 @@
 import { writeFileSync } from 'fs';
+import { SCREENSHOT_DIR } from './config.mjs';
 
 const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -18,8 +19,8 @@ export async function doTaxesVerify(page, otpCode) {
   await page.keyboard.press('Tab');
   await page.waitForTimeout(rand(300, 500));
 
-  await page.screenshot({ path: '/app/taxes-screenshot-04-otp-filled.png', fullPage: true });
-  writeFileSync('/app/taxes-dom-04-otp-filled.html', await page.content(), 'utf-8');
+  await page.screenshot({ path: `${SCREENSHOT_DIR}/taxes-screenshot-04-otp-filled.png`, fullPage: true });
+  writeFileSync(`${SCREENSHOT_DIR}/taxes-dom-04-otp-filled.html`, await page.content(), 'utf-8');
 
   console.log('[taxes/verify] Clicking כניסה (enter)...');
   await page.locator('button.btn-primary', { hasText: 'כניסה' }).click();
@@ -31,6 +32,6 @@ export async function doTaxesVerify(page, otpCode) {
   );
   console.log('[taxes/verify] Authenticated — reached personal area.');
 
-  await page.screenshot({ path: '/app/taxes-screenshot-05-authenticated.png', fullPage: true });
-  writeFileSync('/app/taxes-dom-05-authenticated.html', await page.content(), 'utf-8');
+  await page.screenshot({ path: `${SCREENSHOT_DIR}/taxes-screenshot-05-authenticated.png`, fullPage: true });
+  writeFileSync(`${SCREENSHOT_DIR}/taxes-dom-05-authenticated.html`, await page.content(), 'utf-8');
 }

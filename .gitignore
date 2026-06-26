@@ -2,3 +2,4 @@ local.config.json
 node_modules/
 screenshots/
 doms/
+.env

@@ -15,6 +15,12 @@ function readBody(req) {
 }
 
 const server = http.createServer(async (req, res) => {
+  if (req.method === 'GET' && req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('You have reached FiscalMind');
+    return;
+  }
+
   if (req.method !== 'POST') {
     res.writeHead(405, { 'Content-Type': 'text/plain' });
     res.end('Method Not Allowed');

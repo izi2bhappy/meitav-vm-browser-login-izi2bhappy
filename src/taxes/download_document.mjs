@@ -1,5 +1,5 @@
 import { writeFileSync, readFileSync } from 'fs';
-
+import { SCREENSHOT_DIR } from './config.mjs';
 const PERSONAL_AREA_URL = 'https://secapp.taxes.gov.il/sr-ezor-ishi/main/main-page';
 const FORM106_URL       = 'https://secapp.taxes.gov.il/sr-ezor-ishi/main/form106?fromPage=main-page';
 
@@ -20,8 +20,8 @@ export async function doTaxesDownloadDocument(page) {
     console.log('[taxes/download] Waiting for personal area to render...');
     await page.waitForSelector('text=טפסי 106', { timeout: 30_000 });
 
-    await page.screenshot({ path: '/app/taxes-screenshot-06-personal-area.png', fullPage: true });
-    writeFileSync('/app/taxes-dom-06-personal-area.html', await page.content(), 'utf-8');
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/taxes-screenshot-06-personal-area.png`, fullPage: true });
+    writeFileSync(`${SCREENSHOT_DIR}/taxes-dom-06-personal-area.html`, await page.content(), 'utf-8');
     console.log('[taxes/download] Screenshot saved: taxes-screenshot-06-personal-area.png');
 
     console.log('[taxes/download] Clicking טפסי 106...');
@@ -36,8 +36,8 @@ export async function doTaxesDownloadDocument(page) {
   // ── Step 2: wait for the accordion to render ─────────────────────────────────
   await page.waitForSelector('details.accordion__item', { timeout: 15_000 });
 
-  await page.screenshot({ path: '/app/taxes-screenshot-07-form106-loaded.png', fullPage: true });
-  writeFileSync('/app/taxes-dom-07-form106-loaded.html', await page.content(), 'utf-8');
+  await page.screenshot({ path: `${SCREENSHOT_DIR}/taxes-screenshot-07-form106-loaded.png`, fullPage: true });
+  writeFileSync(`${SCREENSHOT_DIR}/taxes-dom-07-form106-loaded.html`, await page.content(), 'utf-8');
   console.log('[taxes/download] Screenshot saved: taxes-screenshot-07-form106-loaded.png');
 
   // ── Step 3: expand the 2025 accordion ────────────────────────────────────────
@@ -50,8 +50,8 @@ export async function doTaxesDownloadDocument(page) {
     await page.waitForSelector('a[role="button"][aria-label*="2025"]', { timeout: 10_000 });
   }
 
-  await page.screenshot({ path: '/app/taxes-screenshot-08-dropdown-open.png', fullPage: true });
-  writeFileSync('/app/taxes-dom-08-dropdown-open.html', await page.content(), 'utf-8');
+  await page.screenshot({ path: `${SCREENSHOT_DIR}/taxes-screenshot-08-dropdown-open.png`, fullPage: true });
+  writeFileSync(`${SCREENSHOT_DIR}/taxes-dom-08-dropdown-open.html`, await page.content(), 'utf-8');
   console.log('[taxes/download] Screenshot saved: taxes-screenshot-08-dropdown-open.png');
 
   // ── Step 4: capture the PDF ───────────────────────────────────────────────────
@@ -111,7 +111,7 @@ export async function doTaxesDownloadDocument(page) {
 
   if (result.type === 'download') {
     filename = result.download.suggestedFilename() || 'form_106.pdf';
-    savePath = `/app/${filename}`;
+    savePath = `${SCREENSHOT_DIR}/${filename}`;
     await result.download.saveAs(savePath);
     buffer = readFileSync(savePath);
   } else {
@@ -119,14 +119,14 @@ export async function doTaxesDownloadDocument(page) {
     const urlPath = new URL(result.url).pathname;
     filename = urlPath.split('/').pop() || 'form_106.pdf';
     if (!filename.toLowerCase().endsWith('.pdf')) filename += '.pdf';
-    savePath = `/app/${filename}`;
+    savePath = `${SCREENSHOT_DIR}/${filename}`;
     writeFileSync(savePath, buffer);
   }
 
   console.log(`[taxes/download] PDF saved: ${savePath} (${buffer.length} bytes)`);
 
-  await page.screenshot({ path: '/app/taxes-screenshot-09-after-download.png', fullPage: true });
-  writeFileSync('/app/taxes-dom-09-after-download.html', await page.content(), 'utf-8');
+  await page.screenshot({ path: `${SCREENSHOT_DIR}/taxes-screenshot-09-after-download.png`, fullPage: true });
+  writeFileSync(`${SCREENSHOT_DIR}/taxes-dom-09-after-download.html`, await page.content(), 'utf-8');
   console.log('[taxes/download] Screenshot saved: taxes-screenshot-09-after-download.png');
 
   return { buffer, filename, savePath };
