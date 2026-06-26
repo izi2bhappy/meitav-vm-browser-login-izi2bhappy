@@ -25,7 +25,7 @@ jobs:
       - uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/israelkariti/meitav-vm-browser-login:latest
+          tags: ghcr.io/izi2bhappy/meitav-vm-browser-login-izi2bhappy:latest
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -38,4 +38,4 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'meitav-vm-browser-login-2'
-          images: 'ghcr.io/israelkariti/meitav-vm-browser-login:latest'
+          images: 'ghcr.io/izi2bhappy/meitav-vm-browser-login-izi2bhappy:latest'
