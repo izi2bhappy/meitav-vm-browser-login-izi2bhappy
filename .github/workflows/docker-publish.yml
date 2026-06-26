@@ -27,15 +27,3 @@ jobs:
           push: true
           tags: ghcr.io/izi2bhappy/meitav-vm-browser-login-izi2bhappy:latest
 
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E3179BC3B125457380EE8F7771FFAF3B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4AC9719E52844A7F997C30D3C1BC302E }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A5E3FBDC4F134C16918ABB67AABEE5D2 }}
-
-      - name: Deploy container to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'meitav-vm-browser-login-2'
-          images: 'ghcr.io/izi2bhappy/meitav-vm-browser-login-izi2bhappy:latest'
