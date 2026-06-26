@@ -2,7 +2,7 @@ import { writeFileSync } from 'fs';
 
 // Clicks the "resend OTP" link on the OTP screen and waits for the site to
 // confirm or reject the re-send. Returns 'success', 'failed', or 'timeout'.
-export async function doResend(page) {
+export async function doMeitavResend(page) {
   // <a class="green-link-background" ng-click="sendSmsAgain()">יש ללחוץ כאן לשליחה חוזרת</a>
   const resendLink = page.locator('a.green-link-background');
 

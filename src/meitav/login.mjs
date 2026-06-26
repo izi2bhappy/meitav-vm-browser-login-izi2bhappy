@@ -20,7 +20,7 @@ async function typeHuman(page, locator, text) {
 // Opens Chrome, navigates to the Meitav login page, fills in the ID and phone
 // number, and submits the first form. Returns the Playwright page object so
 // that server.mjs can pass it to doVerify() for the OTP step.
-export async function doLogin(idNumber, phoneNumber) {
+export async function doMeitavLogin(idNumber, phoneNumber) {
   // Normalize international format: 972506839593 → 0506839593
   if (phoneNumber.startsWith('972')) phoneNumber = '0' + phoneNumber.slice(3);
 

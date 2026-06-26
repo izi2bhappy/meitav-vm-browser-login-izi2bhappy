@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 // Navigates the authenticated page to the trade forms list, expands the
 // הצהרת תושבות (residency declaration) section, and clicks "לחץ להורדת הטופס"
 // to trigger the file download. Returns the file buffer and suggested filename.
-export async function doDownloadDocument(page) {
+export async function doMeitavDownloadDocument(page) {
   console.log('[download_document] Navigating to tradeforms...');
   await page.goto('https://customers.meitav.co.il/tradeforms', {
     waitUntil: 'domcontentloaded',

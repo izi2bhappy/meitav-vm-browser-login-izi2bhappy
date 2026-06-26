@@ -15,7 +15,7 @@ async function typeHuman(page, locator, text) {
 
 // Receives the Playwright page that doLogin() left open on the OTP screen,
 // types in the 6-digit OTP, submits the form, and saves screenshots + DOM.
-export async function doVerify(page, otp) {
+export async function doMeitavVerify(page, otp) {
   // ── Fill OTP ────────────────────────────────────────────────────────────────
 
   // The OTP input accepts exactly 6 digits; Angular validates min/max length
