@@ -1,3 +1,5 @@
+import { writeFileSync } from 'fs';
+
 const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 async function typeHuman(page, locator, text) {
@@ -16,12 +18,19 @@ export async function doTaxesVerify(page, otpCode) {
   await page.keyboard.press('Tab');
   await page.waitForTimeout(rand(300, 500));
 
+  await page.screenshot({ path: '/app/taxes-screenshot-04-otp-filled.png', fullPage: true });
+  writeFileSync('/app/taxes-dom-04-otp-filled.html', await page.content(), 'utf-8');
+
   console.log('[taxes/verify] Clicking כניסה (enter)...');
   await page.locator('button.btn-primary', { hasText: 'כניסה' }).click();
 
+  // Wait until the browser reaches the personal area main page
   await page.waitForURL(
     url => url.href.includes('sr-ezor-ishi/main/main-page'),
     { timeout: 30_000 }
   );
   console.log('[taxes/verify] Authenticated — reached personal area.');
+
+  await page.screenshot({ path: '/app/taxes-screenshot-05-authenticated.png', fullPage: true });
+  writeFileSync('/app/taxes-dom-05-authenticated.html', await page.content(), 'utf-8');
 }
