@@ -5,7 +5,7 @@ export async function handleLogin(req, res, payload) {
   console.log('[/taxes/login] payload:', JSON.stringify(payload, null, 2));
 
   const { idNumber } = payload;
-  const userCode = process.env.TAXES_USER_CODE;
+  const userCode = process.env.TAXES_USER_PERMANENT_CODE;
   if (!idNumber) {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'idNumber is required' }));
@@ -13,7 +13,7 @@ export async function handleLogin(req, res, payload) {
   }
   if (!userCode) {
     res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'TAXES_USER_CODE environment variable is not set' }));
+    res.end(JSON.stringify({ error: 'TAXES_USER_PERMANENT_CODE environment variable is not set' }));
     return;
   }
 
